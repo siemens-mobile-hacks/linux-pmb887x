@@ -431,6 +431,8 @@ source "arch/arm/mach-orion5x/Kconfig"
 
 source "arch/arm/mach-pxa/Kconfig"
 
+source "arch/arm/mach-pmb887x/Kconfig"
+
 source "arch/arm/mach-qcom/Kconfig"
 
 source "arch/arm/mach-realtek/Kconfig"

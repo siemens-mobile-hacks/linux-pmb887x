@@ -1,0 +1,161 @@
+// SPDX-License-Identifier: GPL-2.0
+
+/ {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	compatible = "infineon,pmb8876";
+	interrupt-parent = <&intc>;
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			compatible = "arm,arm926ej-s";
+			device_type = "cpu";
+			reg = <0>;
+		};
+	};
+	
+	clocks {
+		fsys_clk: fsys_clk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <26000000>;
+		};
+	};
+	
+	soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "simple-bus";
+		interrupt-parent = <&intc>;
+		ranges;
+		
+		intc: interrupt-controller@f2800000 {
+			compatible = "pmb887x,intc";
+			#interrupt-cells = <1>;
+			interrupt-controller;
+			reg = <0xf2800000 0x1000>;
+		};
+		
+		tpu: timer@f6400000 {
+			compatible = "pmb887x,tpu";
+			reg = <0xf6400000 0x1000>;
+			interrupts = <0x77>;
+			clocks = <&ftpu_clk>;
+			clock-frequency = <1000000>;
+			
+			ftpu_clk: ftpu_clk {
+				compatible = "pmb887x,clc";
+				clocks = <&fsys_clk>;
+				#clock-cells = <0>;
+			};
+		};
+		
+		stm: timer@f4b00000 {
+			compatible = "pmb887x,stm";
+			reg = <0xf4b00000 0x1000>;
+			clocks = <&fstm_clk>;
+			
+			fstm_clk: fstm_clk {
+				compatible = "pmb887x,clc";
+				clocks = <&fsys_clk>;
+				#clock-cells = <0>;
+			};
+		};
+		
+		dmac: dma-controller@f3000000 {
+			compatible = "arm,pl080", "arm,primecell";
+			arm,primecell-periphid = <0x00041081>;
+			reg = <0xf3000000 0x1000>;
+			interrupt-parent = <&intc>;
+			interrupts = <0x23>, <0x24>, <0x25>, <0x26>, <0x27>, <0x28>, <0x29>, <0x2A>, <0x2B>;
+			clocks = <&fsys_clk>;
+			clock-names = "apb_pclk";
+			#dma-cells = <2>;
+			dma-channels = <8>;
+			dma-requests = <16>;
+			lli-bus-interface-ahb1;
+			lli-bus-interface-ahb2;
+			mem-bus-interface-ahb1;
+			mem-bus-interface-ahb2;
+			memcpy-burst-size = <256>;
+			memcpy-bus-width = <32>;
+		};
+		
+		gpio: gpio@f4300000 {
+			compatible = "pmb8876,pinctrl";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			reg = <0xf4300000 0x1000>;
+			pins-are-numbered;
+			gpio-controller;
+			#gpio-cells = <2>;
+			
+			mmc_pins: mmc-pins {
+				pins = "MMCI_DAT0", "MMCI_CLK", "MMCI_CMD";
+				function = "MMC";
+			};
+			
+			usart0_pins: usart0-pins {
+				pins = "USART0_TXD", "USART0_RXD";
+				function = "USART0";
+			};
+			
+			usart1_pins: usart1-pins {
+				pins = "USART1_TXD", "USART1_RXD";
+				function = "USART1";
+			};
+		};
+		
+		mmc: mmc@f7301000 {
+			compatible = "arm,pl180", "arm,primecell";
+			reg-names = "default", "pmb887x-clc";
+			reg = <0xf7301000 0x1000>, <0xf7300000 4>;
+			dma-names = "mmci0_rx", "mmci0_tx";
+			interrupt-parent = <&intc>;
+			interrupts = <0x94>;
+			clocks = <&fmmc_clk>;
+			clock-names = "apb_pclk";
+			status = "disabled";
+			
+			fmmc_clk: fmmc_clk {
+				compatible = "pmb887x,clc";
+				clocks = <&fsys_clk>;
+				#clock-cells = <0>;
+				clock-frequency = <13000000>;
+			};
+		};
+		
+		usart0: serial@f1000000 {
+			compatible = "pmb887x,asc";
+			reg = <0xf1000000 0x1000>;
+			interrupt-names = "tx", "rx";
+			interrupts = <4>, <6>;
+			clocks = <&fasc0_clk>;
+			status = "disabled";
+			
+			fasc0_clk: fasc0_clk {
+				compatible = "pmb887x,clc";
+				clocks = <&fsys_clk>;
+				#clock-cells = <0>;
+			};
+		};
+		
+		usart1: serial@f1800000 {
+			compatible = "pmb887x,asc";
+			reg = <0xf1800000 0x1000>;
+			interrupt-names = "tx", "rx";
+			interrupts = <26>, <28>;
+			clocks = <&fasc1_clk>;
+			status = "disabled";
+			
+			fasc1_clk: fasc1_clk {
+				compatible = "pmb887x,clc";
+				clocks = <&fsys_clk>;
+				#clock-cells = <0>;
+			};
+		};
+	};
+};

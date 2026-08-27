@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-only
+config PMB887X_CCU
+	tristate "Clock support for PMB887X SoCs"
+	depends on ARCH_PMB887X || COMPILE_TEST
+	default ARCH_PMB887X

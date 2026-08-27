@@ -15,6 +15,7 @@ subdir-y += cnxt
 subdir-y += gemini
 subdir-y += hisilicon
 subdir-y += hpe
+subdir-y += infineon
 subdir-y += intel
 subdir-y += marvell
 subdir-y += mediatek

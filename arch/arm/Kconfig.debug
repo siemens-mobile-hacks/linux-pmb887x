@@ -778,6 +778,16 @@ choice
 		depends on ARCH_OMAP2PLUS
 		select DEBUG_OMAP2PLUS_UART
 
+	config DEBUG_PMB887X_UART0
+		bool "Use PMB887x UART0 for low-level debug"
+		depends on ARCH_PMB887X
+		select DEBUG_PMB887X_UART
+	
+	config DEBUG_PMB887X_UART1
+		bool "Use PMB887x UART1 for low-level debug"
+		depends on ARCH_PMB887X
+		select DEBUG_PMB887X_UART
+
 	config DEBUG_PXA_UART1
 		depends on ARCH_PXA
 		bool "Use PXA UART1 for low-level debug"
@@ -1429,6 +1439,10 @@ config DEBUG_OMAP2PLUS_UART
 	bool
 	depends on ARCH_OMAP2PLUS
 
+config DEBUG_PMB887X_UART
+	bool
+	depends on ARCH_PMB887X
+
 config DEBUG_IMX_UART_PORT
 	int "i.MX Debug UART Port Selection"
 	depends on DEBUG_IMX1_UART || \
@@ -1505,6 +1519,7 @@ config DEBUG_LL_INCLUDE
 				 DEBUG_IMX7D_UART
 	default "debug/msm.S" if DEBUG_QCOM_UARTDM
 	default "debug/omap2plus.S" if DEBUG_OMAP2PLUS_UART
+	default "debug/pmb887x.S" if DEBUG_PMB887X_UART
 	default "debug/renesas-scif.S" if DEBUG_R7S72100_SCIF2
 	default "debug/renesas-scif.S" if DEBUG_R7S9210_SCIF2
 	default "debug/renesas-scif.S" if DEBUG_R7S9210_SCIF4
@@ -1632,6 +1647,8 @@ config DEBUG_UART_PHYS
 	default 0xe8008000 if DEBUG_R7S72100_SCIF2 || DEBUG_R7S9210_SCIF2
 	default 0xe8009000 if DEBUG_R7S9210_SCIF4
 	default 0xf0000000 if DEBUG_DIGICOLOR_UA0
+	default 0xf1000000 if DEBUG_PMB887X_UART0
+	default 0xf1800000 if DEBUG_PMB887X_UART1
 	default 0xf1012000 if DEBUG_MVEBU_UART0_ALTERNATE
 	default 0xf1012100 if DEBUG_MVEBU_UART1_ALTERNATE
 	default 0xf7fc9000 if DEBUG_BERLIN_UART
@@ -1673,7 +1690,7 @@ config DEBUG_UART_PHYS
 		DEBUG_DIGICOLOR_UA0 || \
 		DEBUG_AT91_UART || DEBUG_STM32_UART || \
 		DEBUG_STIH41X_ASC2 || DEBUG_STIH41X_SBC_ASC1 || \
-		DEBUG_STIH418_SBC_ASC0
+		DEBUG_STIH418_SBC_ASC0 || DEBUG_PMB887X_UART
 
 config DEBUG_UART_VIRT
 	hex "Virtual base address of debug UART"
@@ -1687,6 +1704,7 @@ config DEBUG_UART_VIRT
 	default 0xf01fb000 if DEBUG_NOMADIK_UART
 	default 0xf0201000 if DEBUG_BCM2835 || DEBUG_BCM2836
 	default 0xf0221000 if DEBUG_MSTARV7_PMUART
+	default 0xf1000000 if DEBUG_PMB887X_UART0
 	default 0xf1000300 if DEBUG_BCM_5301X
 	default 0xf1000400 if DEBUG_BCM_HR2
 	default 0xf1002000 if DEBUG_MT8127_UART0
@@ -1695,6 +1713,7 @@ config DEBUG_UART_VIRT
 	default 0xf1023000 if DEBUG_BCM_IPROC_UART3
 	default 0xf11f1000 if DEBUG_VERSATILE
 	default 0xf1600000 if DEBUG_INTEGRATOR
+	default 0xf1800000 if DEBUG_PMB887X_UART1
 	default 0xf1c28000 if DEBUG_SUNXI_UART0
 	default 0xf1c28400 if DEBUG_SUNXI_UART1
 	default 0xf1f02800 if DEBUG_SUNXI_R_UART
@@ -1775,7 +1794,7 @@ config DEBUG_UART_VIRT
 		DEBUG_DIGICOLOR_UA0 || \
 		DEBUG_AT91_UART || DEBUG_STM32_UART || \
 		DEBUG_STIH41X_ASC2 || DEBUG_STIH41X_SBC_ASC1 || \
-		DEBUG_STIH418_SBC_ASC0
+		DEBUG_STIH418_SBC_ASC0 || DEBUG_PMB887X_UART
 
 config DEBUG_UART_8250_SHIFT
 	int "Register offset shift for the 8250 debug UART"

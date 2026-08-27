@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-2.0-only
+if ARCH_PMB887X || COMPILE_TEST
+
+config PINCTRL_PMB887X
+	bool
+	depends on OF
+	select PINMUX
+	select GENERIC_PINCONF
+	select GENERIC_PINMUX_FUNCTIONS
+	select GENERIC_PINCTRL_GROUPS
+	select GPIOLIB
+	select IRQ_DOMAIN_HIERARCHY
+endif

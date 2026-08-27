@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: GPL-2.0
+/dts-v1/;
+#include "pmb8876.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "LG KE970";
+	compatible = "lg,ke970", "infineon,pmb8876";
+	
+	aliases {
+		serial0 = &usart0;
+		serial1 = &usart1;
+	};
+	
+	chosen {
+		bootargs = "earlycon=asc,0xf1000000 console=asc,0xf1000000 ignore_loglevel";
+		stdout-path = "serial0:115200n8";
+	};
+	
+	/* RAM */
+	memory@b0000000 {
+		device_type = "memory";
+		reg = <0xb0000000 0x2000000>;
+	};
+};
+
+/* Usart at "nano" connector */
+&usart0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usart0_pins>;
+};
+
+/* Usart for debug */
+&usart1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usart1_pins>;
+};

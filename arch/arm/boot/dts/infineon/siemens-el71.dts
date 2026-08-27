@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: GPL-2.0
+/dts-v1/;
+#include "pmb8876.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "BenQ-Siemens EL71";
+	compatible = "siemens,el71", "infineon,pmb8876";
+	
+	aliases {
+		serial0 = &usart0;
+		serial1 = &usart1;
+	};
+	
+	chosen {
+		bootargs = "earlyprintk";
+		stdout-path = "serial0:1625000n8";
+	};
+	
+	mmc_vcc: mmc-vcc {
+		compatible = "regulator-gpio";
+		regulator-name = "mmc-vcc";
+		states = <2900000 0>;
+		regulator-min-microvolt = <2900000>;
+		regulator-max-microvolt = <2900000>;
+		enable-gpio = <&gpio 58 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+	
+	/* RAM */
+	memory@a8000000 {
+		device_type = "memory";
+		reg = <0xa8000000 0x1000000>;
+	};
+	
+	/* External watchdog */
+	watchdog: watchdog {
+		compatible = "linux,wdt-gpio-v2";
+		gpios = <&gpio 62 GPIO_ACTIVE_HIGH>;
+		wdt-min-time = <550>;
+		wdt-max-time = <2000>;
+	};
+};
+
+/* Usart at "nano" connector */
+&usart0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usart0_pins>;
+};
+
+/* Usart for bluetooth */
+&usart1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usart1_pins>;
+};
+
+&mmc {
+	status = "okay";
+	vmmc-supply = <&mmc_vcc>;
+	vqmmc-supply = <&mmc_vcc>;
+	cd-gpios = <&gpio 77 GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc_pins>;
+	bus-width = <1>;
+	cap-sd-highspeed;
+	cap-mmc-highspeed;
+};
