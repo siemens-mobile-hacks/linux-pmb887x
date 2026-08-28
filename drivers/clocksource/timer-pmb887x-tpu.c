@@ -53,9 +53,9 @@
 
 #define TPU_SRC(n) (0xF8 + ((n) * 0x4))
 
-#define TPU_SRC_SRPN GENMASK(8, 0)
+#define TPU_SRC_SRPN GENMASK(7, 0)
 #define TPU_SRC_SRPN_SHIFT 0
-#define TPU_SRC_TOS GENMASK(2, 10)
+#define TPU_SRC_TOS GENMASK(11, 10)
 #define TPU_SRC_TOS_SHIFT 10
 #define TPU_SRC_SRE BIT(12)
 #define TPU_SRC_SRR BIT(13)
