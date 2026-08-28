@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
+#include <dt-bindings/pinctrl/pmb887x.h>
+
 / {
 	#address-cells = <1>;
 	#size-cells = <1>;
@@ -92,20 +94,35 @@
 			pins-are-numbered;
 			gpio-controller;
 			#gpio-cells = <2>;
-			
-			mmc_pins: mmc-pins {
-				pins = "MMCI_DAT0", "MMCI_CLK", "MMCI_CMD";
-				function = "MMC";
+			#pinctrl-cells = <1>;
+
+			/* Pad config shared by all pmb8876 boards: UART, USB, I2C */
+			usart0_pins: usart0-pads {
+				pmb887x,pads = <
+					PMB887X_PAD(PMB887X_PIN_USART0_RXD, PMB887X_IS_ALT0 | PMB887X_PPEN_OPENDRAIN | PMB887X_PDPU_PULLUP)
+					PMB887X_PAD(PMB887X_PIN_USART0_TXD, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
+				>;
 			};
-			
-			usart0_pins: usart0-pins {
-				pins = "USART0_TXD", "USART0_RXD";
-				function = "USART0";
+
+			usart1_pins: usart1-pads {
+				pmb887x,pads = <
+					PMB887X_PAD(PMB887X_PIN_USART1_RXD, PMB887X_IS_ALT0 | PMB887X_PPEN_OPENDRAIN | PMB887X_PDPU_PULLUP)
+					PMB887X_PAD(PMB887X_PIN_USART1_TXD, PMB887X_OS_ALT0)
+				>;
 			};
-			
-			usart1_pins: usart1-pins {
-				pins = "USART1_TXD", "USART1_RXD";
-				function = "USART1";
+
+			usb_pads: usb-pads {
+				pmb887x,pads = <
+					PMB887X_PAD(PMB887X_PIN_USB_DPLUS, PMB887X_PS_MANUAL | PMB887X_DIR_OUT)
+					PMB887X_PAD(PMB887X_PIN_USB_DMINUS, PMB887X_OS_ALT3)
+				>;
+			};
+
+			i2c_pads: i2c-pads {
+				pmb887x,pads = <
+					PMB887X_PAD(PMB887X_PIN_I2C_SCL, PMB887X_IS_ALT0 | PMB887X_OS_ALT0 | PMB887X_PPEN_OPENDRAIN)
+					PMB887X_PAD(PMB887X_PIN_I2C_SDA, PMB887X_IS_ALT0 | PMB887X_OS_ALT0 | PMB887X_PPEN_OPENDRAIN)
+				>;
 			};
 		};
 		

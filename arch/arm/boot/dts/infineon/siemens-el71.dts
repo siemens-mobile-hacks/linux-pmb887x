@@ -3,6 +3,7 @@
 #include "pmb8876.dtsi"
 
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/pmb887x.h>
 
 / {
 	model = "BenQ-Siemens EL71";
@@ -63,8 +64,18 @@
 	vqmmc-supply = <&mmc_vcc>;
 	cd-gpios = <&gpio 77 GPIO_ACTIVE_HIGH>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&mmc_pins>;
+	pinctrl-0 = <&mmc_pads>;
 	bus-width = <1>;
 	cap-sd-highspeed;
 	cap-mmc-highspeed;
+};
+
+&gpio {
+	mmc_pads: mmc-pads {
+		pmb887x,pads = <
+			PMB887X_PAD(PMB887X_PIN_MMCI_DAT0, PMB887X_IS_ALT0 | PMB887X_OS_ALT0)
+			PMB887X_PAD(PMB887X_PIN_MMCI_CLK, PMB887X_IS_ALT0 | PMB887X_OS_ALT0)
+			PMB887X_PAD(PMB887X_PIN_MMCI_CMD, PMB887X_IS_ALT0 | PMB887X_OS_ALT0)
+		>;
+	};
 };
