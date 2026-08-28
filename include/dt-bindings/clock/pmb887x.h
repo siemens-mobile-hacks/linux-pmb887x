@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+#ifndef _DT_BINDINGS_CLOCK_PMB887X_H
+#define _DT_BINDINGS_CLOCK_PMB887X_H
+
+#define PMB887X_CLK_MMC		0
+#define PMB887X_CLK_ASC0	1
+#define PMB887X_CLK_ASC1	2
+#define PMB887X_CLK_STM		3
+#define PMB887X_CLK_TPU		4
+
+#endif /* _DT_BINDINGS_CLOCK_PMB887X_H */

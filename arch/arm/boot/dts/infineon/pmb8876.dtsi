@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
+#include <dt-bindings/clock/pmb887x.h>
 #include <dt-bindings/pinctrl/pmb887x.h>
 
 / {
@@ -41,30 +42,32 @@
 			reg = <0xf2800000 0x1000>;
 		};
 		
+		clc: clock-controller@f7300000 {
+			compatible = "pmb887x,clc";
+			reg = <0xf7300000 4>,	/* PMB887X_CLK_MMC */
+			      <0xf1000000 4>,	/* PMB887X_CLK_ASC0 */
+			      <0xf1800000 4>,	/* PMB887X_CLK_ASC1 */
+			      <0xf4b00000 4>,	/* PMB887X_CLK_STM */
+			      <0xf6400000 4>;	/* PMB887X_CLK_TPU */
+			clocks = <&fsys_clk>;
+			#clock-cells = <1>;
+
+			assigned-clocks = <&clc PMB887X_CLK_MMC>;
+			assigned-clock-rates = <13000000>;
+		};
+
 		tpu: timer@f6400000 {
 			compatible = "pmb887x,tpu";
 			reg = <0xf6400000 0x1000>;
 			interrupts = <0x77>;
-			clocks = <&ftpu_clk>;
+			clocks = <&clc PMB887X_CLK_TPU>;
 			clock-frequency = <1000000>;
-			
-			ftpu_clk: ftpu_clk {
-				compatible = "pmb887x,clc";
-				clocks = <&fsys_clk>;
-				#clock-cells = <0>;
-			};
 		};
-		
+
 		stm: timer@f4b00000 {
 			compatible = "pmb887x,stm";
 			reg = <0xf4b00000 0x1000>;
-			clocks = <&fstm_clk>;
-			
-			fstm_clk: fstm_clk {
-				compatible = "pmb887x,clc";
-				clocks = <&fsys_clk>;
-				#clock-cells = <0>;
-			};
+			clocks = <&clc PMB887X_CLK_STM>;
 		};
 		
 		dmac: dma-controller@f3000000 {
@@ -128,21 +131,13 @@
 		
 		mmc: mmc@f7301000 {
 			compatible = "arm,pl180", "arm,primecell";
-			reg-names = "default", "pmb887x-clc";
-			reg = <0xf7301000 0x1000>, <0xf7300000 4>;
+			reg = <0xf7301000 0x1000>;
 			dma-names = "mmci0_rx", "mmci0_tx";
 			interrupt-parent = <&intc>;
 			interrupts = <0x94>;
-			clocks = <&fmmc_clk>;
+			clocks = <&clc PMB887X_CLK_MMC>;
 			clock-names = "apb_pclk";
 			status = "disabled";
-			
-			fmmc_clk: fmmc_clk {
-				compatible = "pmb887x,clc";
-				clocks = <&fsys_clk>;
-				#clock-cells = <0>;
-				clock-frequency = <13000000>;
-			};
 		};
 		
 		usart0: serial@f1000000 {
@@ -150,14 +145,8 @@
 			reg = <0xf1000000 0x1000>;
 			interrupt-names = "tx", "rx";
 			interrupts = <4>, <6>;
-			clocks = <&fasc0_clk>;
+			clocks = <&clc PMB887X_CLK_ASC0>;
 			status = "disabled";
-			
-			fasc0_clk: fasc0_clk {
-				compatible = "pmb887x,clc";
-				clocks = <&fsys_clk>;
-				#clock-cells = <0>;
-			};
 		};
 		
 		usart1: serial@f1800000 {
@@ -165,14 +154,8 @@
 			reg = <0xf1800000 0x1000>;
 			interrupt-names = "tx", "rx";
 			interrupts = <26>, <28>;
-			clocks = <&fasc1_clk>;
+			clocks = <&clc PMB887X_CLK_ASC1>;
 			status = "disabled";
-			
-			fasc1_clk: fasc1_clk {
-				compatible = "pmb887x,clc";
-				clocks = <&fsys_clk>;
-				#clock-cells = <0>;
-			};
 		};
 	};
 };
