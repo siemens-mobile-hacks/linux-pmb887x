@@ -504,7 +504,7 @@ static void asc_set_termios(struct uart_port *port, struct ktermios *termios, co
 	
 	// Recalc baudrate
 	baud = uart_get_baud_rate(port, termios, old, 0, port->uartclk / ASC_CLOCK_DIV);
-	baud = asc_calc_fdv_bg(port, baud, &fdv, &bg);
+	baud = asc_calc_fdv_bg(port, baud, &bg, &fdv);
 	
 	spin_lock_irqsave(&port->lock, flags);
 	
@@ -754,7 +754,13 @@ static void asc_console_putchar(struct uart_port *port, unsigned char ch) {
 	u32 timeout = 1000000;
 	while (timeout-- && asc_tx_fifo_is_full(port))
 		udelay(1);
+
+	asc_out(port, ASC_ICR, ASC_ICR_TX);
 	asc_out(port, ASC_TXB, ch);
+
+	timeout = 1000000;
+	while (timeout-- && !(asc_in(port, ASC_RIS) & ASC_RIS_TX))
+		udelay(1);
 }
 
 static void asc_console_write(struct console *co, const char *s, unsigned count) {
