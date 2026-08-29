@@ -489,6 +489,14 @@ config BACKLIGHT_GPIO
 	  If you have a LCD backlight adjustable by GPIO, say Y to enable
 	  this driver.
 
+config BACKLIGHT_KE970
+	tristate "LG KE970 LCD Backlight Driver"
+	depends on MFD_PMB887X_CAPCOM || COMPILE_TEST
+	help
+	  Say Y to enable the LCD backlight on the LG KE970 (Shine). Its
+	  MAX8645Y charge pump is dimmed over a single wire driven by a
+	  CAPCOM channel output, so this needs the PMB887x CAPCOM driver.
+
 config BACKLIGHT_LV5207LP
 	tristate "Sanyo LV5207LP Backlight"
 	depends on I2C

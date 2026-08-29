@@ -41,6 +41,15 @@
 	pinctrl-0 = <&usart1_pins>;
 };
 
+/* MAX8645Y single-wire pulse dimming on CC3, pad LCD_BACKLIGHT (ALT2 output) */
+&capcom1 {
+	backlight: backlight {
+		compatible = "lg,ke970-backlight";
+		lg,capcom-channel = <3>;
+		default-brightness-level = <24>;
+	};
+};
+
 &gpio {
 	gpio-line-names = "KP_IN0", "KP_IN1", "KP_IN2", "KP_IN3", "KP_IN4", "KP_IN5", "KP_IN6", "KP_OUT0", "KP_OUT1",
 		"KP_OUT2", "KP_OUT3", "USART0_RXD", "USART0_TXD", "USART0_RTS", "USART0_CTS", "SCROLL_KEY_A",
