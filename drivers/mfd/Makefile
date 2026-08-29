@@ -124,6 +124,8 @@ obj-$(CONFIG_MFD_MC13XXX_I2C)	+= mc13xxx-i2c.o
 
 obj-$(CONFIG_MFD_PF1550)	+= pf1550.o
 
+obj-$(CONFIG_MFD_PMB887X_CAPCOM)	+= pmb887x-capcom.o
+
 obj-$(CONFIG_MFD_NCT6694)	+= nct6694.o
 
 obj-$(CONFIG_MFD_CORE)		+= mfd-core.o

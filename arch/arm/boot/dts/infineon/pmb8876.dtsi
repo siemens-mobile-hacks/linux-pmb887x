@@ -48,7 +48,9 @@
 			      <0xf1000000 4>,	/* PMB887X_CLK_ASC0 */
 			      <0xf1800000 4>,	/* PMB887X_CLK_ASC1 */
 			      <0xf4b00000 4>,	/* PMB887X_CLK_STM */
-			      <0xf6400000 4>;	/* PMB887X_CLK_TPU */
+			      <0xf6400000 4>,	/* PMB887X_CLK_TPU */
+			      <0xf4000000 4>,	/* PMB887X_CLK_CAPCOM0 */
+			      <0xf4100000 4>;	/* PMB887X_CLK_CAPCOM1 */
 			clocks = <&fsys_clk>;
 			#clock-cells = <1>;
 
@@ -62,6 +64,32 @@
 			interrupts = <0x77>;
 			clocks = <&clc PMB887X_CLK_TPU>;
 			clock-frequency = <1000000>;
+		};
+
+		capcom0: timer@f4000000 {
+			compatible = "pmb887x,capcom";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			reg = <0xf4000000 0x1000>;
+			ranges;
+			interrupt-names = "t0", "t1", "cc0", "cc1", "cc2",
+					  "cc3", "cc4", "cc5", "cc6", "cc7";
+			interrupts = <72>, <73>, <74>, <75>, <76>,
+				     <77>, <78>, <79>, <80>, <81>;
+			clocks = <&clc PMB887X_CLK_CAPCOM0>;
+		};
+
+		capcom1: timer@f4100000 {
+			compatible = "pmb887x,capcom";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			reg = <0xf4100000 0x1000>;
+			ranges;
+			interrupt-names = "t0", "t1", "cc0", "cc1", "cc2",
+					  "cc3", "cc4", "cc5", "cc6", "cc7";
+			interrupts = <82>, <83>, <84>, <85>, <86>,
+				     <87>, <88>, <89>, <90>, <91>;
+			clocks = <&clc PMB887X_CLK_CAPCOM1>;
 		};
 
 		stm: timer@f4b00000 {

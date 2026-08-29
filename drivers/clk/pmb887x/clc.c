@@ -135,7 +135,8 @@ static struct clk_hw *__init pmb887x_clc_register(void __iomem *reg,
 static const char *const pmb887x_clc_names[] = {
 	[PMB887X_CLK_MMC] = "fmmc_clk",	  [PMB887X_CLK_ASC0] = "fasc0_clk",
 	[PMB887X_CLK_ASC1] = "fasc1_clk", [PMB887X_CLK_STM] = "fstm_clk",
-	[PMB887X_CLK_TPU] = "ftpu_clk",
+	[PMB887X_CLK_TPU] = "ftpu_clk",	  [PMB887X_CLK_CAPCOM0] = "fcapcom0_clk",
+	[PMB887X_CLK_CAPCOM1] = "fcapcom1_clk",
 };
 
 static void __init pmb887x_ccu_of(struct device_node *np)

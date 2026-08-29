@@ -633,6 +633,16 @@ config MFD_PF1550
 	  This driver can also be built as a module and if so will be called
 	  pf1550.
 
+config MFD_PMB887X_CAPCOM
+	bool "Infineon PMB887x CAPCOM support"
+	depends on OF && (ARCH_PMB887X || COMPILE_TEST)
+	default ARCH_PMB887X
+	help
+	  Select this option to enable the Infineon PMB887x CAPture/COMpare
+	  driver. It maps the block and shares it between the PWM, counter
+	  and interrupt controller drivers described below it in the device
+	  tree, none of which is usable on its own.
+
 config MFD_HI6421_PMIC
 	tristate "HiSilicon Hi6421 PMU/Codec IC"
 	depends on OF
