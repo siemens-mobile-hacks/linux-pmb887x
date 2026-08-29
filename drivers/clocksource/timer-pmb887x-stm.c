@@ -41,8 +41,12 @@ static void __iomem *stm_base;
 
 static u64 pmb887x_stm_read(void)
 {
-	return ((u64)readl(stm_base + STM_TIM6) << 32) |
-	       (u64)readl(stm_base + STM_TIM0);
+	u32 low, high;
+
+	low = readl(stm_base + STM_TIM0);
+	high = readl(stm_base + STM_CAP);
+
+	return ((u64)high << 32) | low;
 }
 
 static u64 pmb887x_stm_clocksource_read(struct clocksource *cs)

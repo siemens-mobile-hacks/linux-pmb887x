@@ -24,7 +24,7 @@
 #define TPU_OVERFLOW_VALUE GENMASK(15, 0)
 #define TPU_OVERFLOW_VALUE_SHIFT 0
 
-#define TPU_OVERFLOW_MIN 1
+#define TPU_OVERFLOW_MIN 50
 #define TPU_OVERFLOW_MAX 32767
 
 #define TPU_INT(n) (0x24 + ((n) * 0x4))
@@ -66,6 +66,14 @@ struct pmb887x_tpu_priv {
 	u32 freq;
 };
 
+static void pmb887x_tpu_arm(struct timer_of *to, u32 frame, u32 compare)
+{
+	writel(0, timer_of_base(to) + TPU_PARAM);
+	writel(frame, timer_of_base(to) + TPU_OVERFLOW);
+	writel(compare, timer_of_base(to) + TPU_INT(0));
+	writel(TPU_PARAM_FDIS | TPU_PARAM_TINI, timer_of_base(to) + TPU_PARAM);
+}
+
 static int pmb887x_tpu_set_next_event(long unsigned int delta,
 				      struct clock_event_device *clkevt)
 {
@@ -73,9 +81,7 @@ static int pmb887x_tpu_set_next_event(long unsigned int delta,
 
 	pr_debug("set_next_event = %ld\n", delta);
 
-	writel(0, timer_of_base(to) + TPU_PARAM);
-	writel(delta, timer_of_base(to) + TPU_OVERFLOW);
-	writel(TPU_PARAM_FDIS | TPU_PARAM_TINI, timer_of_base(to) + TPU_PARAM);
+	pmb887x_tpu_arm(to, TPU_OVERFLOW_MAX, delta);
 
 	return 0;
 }
@@ -104,7 +110,7 @@ static int pmb887x_tpu_set_periodic(struct clock_event_device *clkevt)
 		return -ETIME;
 	}
 
-	pmb887x_tpu_set_next_event(ticks_per_jiffy - 1, clkevt);
+	pmb887x_tpu_arm(to, ticks_per_jiffy - 1, 0);
 
 	return 0;
 }
@@ -158,7 +164,6 @@ static irqreturn_t pmb887x_tpu_handler(int irq, void *dev_id)
 {
 	struct clock_event_device *clkevt = (struct clock_event_device *)dev_id;
 	struct timer_of *to = to_timer_of(clkevt);
-	u32 tmp;
 
 	if (!clockevent_state_periodic(clkevt))
 		pmb887x_tpu_shutdown(clkevt);
