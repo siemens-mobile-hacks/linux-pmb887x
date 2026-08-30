@@ -16,7 +16,7 @@
 	};
 	
 	chosen {
-		bootargs = "earlycon=asc,0xf1000000 console=asc,0xf1000000 ignore_loglevel";
+		bootargs = "earlycon=asc,0xf1000000 console=ttyASC0,115200n8 ignore_loglevel root=mtd:rootfs rootfstype=cramfs ro";
 		stdout-path = "serial0:115200n8";
 	};
 	
@@ -24,6 +24,50 @@
 	memory@b0000000 {
 		device_type = "memory";
 		reg = <0xb0000000 0x2000000>;
+	};
+
+	/* NOR Flash */
+	flash@a0000000 {
+		compatible = "cfi-flash";
+		reg = <0xa0000000 0x8000000>;
+		bank-width = <2>;
+		erase-size = <0x40000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "bootcore";
+				reg = <0x00000000 0x000c0000>;
+				read-only;
+			};
+
+			partition@c0000 {
+				label = "dtb";
+				reg = <0x000c0000 0x00040000>;
+				read-only;
+			};
+
+			partition@100000 {
+				label = "kernel";
+				reg = <0x00100000 0x00f00000>;
+				read-only;
+			};
+
+			partition@1000000 {
+				label = "rootfs";
+				reg = <0x01000000 0x02000000>;
+				read-only;
+			};
+
+			partition@3000000 {
+				label = "apoxi-ffs";
+				reg = <0x03000000 0x05000000>;
+				read-only;
+			};
+		};
 	};
 };
 
