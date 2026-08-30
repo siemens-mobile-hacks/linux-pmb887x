@@ -290,17 +290,17 @@ struct cfi_private {
 	struct flchip chips[] __counted_by(numchips);  /* per-chip data structure for each chip */
 };
 
-uint32_t cfi_build_cmd_addr(uint32_t cmd_ofs,
+uint32_t __xipram cfi_build_cmd_addr(uint32_t cmd_ofs,
 				struct map_info *map, struct cfi_private *cfi);
 
-map_word cfi_build_cmd(u_long cmd, struct map_info *map, struct cfi_private *cfi);
+map_word __xipram cfi_build_cmd(u_long cmd, struct map_info *map, struct cfi_private *cfi);
 #define CMD(x)  cfi_build_cmd((x), map, cfi)
 
-unsigned long cfi_merge_status(map_word val, struct map_info *map,
+unsigned long __xipram cfi_merge_status(map_word val, struct map_info *map,
 					   struct cfi_private *cfi);
 #define MERGESTATUS(x) cfi_merge_status((x), map, cfi)
 
-uint32_t cfi_send_gen_cmd(u_char cmd, uint32_t cmd_addr, uint32_t base,
+uint32_t __xipram cfi_send_gen_cmd(u_char cmd, uint32_t cmd_addr, uint32_t base,
 				struct map_info *map, struct cfi_private *cfi,
 				int type, map_word *prev_val);
 

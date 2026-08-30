@@ -36,7 +36,7 @@ EXPORT_SYMBOL(cfi_udelay);
 /*
  * Returns the command address according to the given geometry.
  */
-uint32_t cfi_build_cmd_addr(uint32_t cmd_ofs,
+uint32_t __xipram cfi_build_cmd_addr(uint32_t cmd_ofs,
 				struct map_info *map, struct cfi_private *cfi)
 {
 	unsigned bankwidth = map_bankwidth(map);
@@ -63,7 +63,7 @@ EXPORT_SYMBOL(cfi_build_cmd_addr);
  * It looks too long to be inline, but in the common case it should almost all
  * get optimised away.
  */
-map_word cfi_build_cmd(u_long cmd, struct map_info *map, struct cfi_private *cfi)
+map_word __xipram cfi_build_cmd(u_long cmd, struct map_info *map, struct cfi_private *cfi)
 {
 	map_word val = { {0} };
 	int wordwidth, words_per_bus, chip_mode, chips_per_word;
@@ -129,7 +129,7 @@ map_word cfi_build_cmd(u_long cmd, struct map_info *map, struct cfi_private *cfi
 }
 EXPORT_SYMBOL(cfi_build_cmd);
 
-unsigned long cfi_merge_status(map_word val, struct map_info *map,
+unsigned long __xipram cfi_merge_status(map_word val, struct map_info *map,
 					   struct cfi_private *cfi)
 {
 	int wordwidth, words_per_bus, chip_mode, chips_per_word;
@@ -199,7 +199,7 @@ EXPORT_SYMBOL(cfi_merge_status);
  * If prev_val is non-null, it will be set to the value at the command address,
  * before the command was written.
  */
-uint32_t cfi_send_gen_cmd(u_char cmd, uint32_t cmd_addr, uint32_t base,
+uint32_t __xipram cfi_send_gen_cmd(u_char cmd, uint32_t cmd_addr, uint32_t base,
 				struct map_info *map, struct cfi_private *cfi,
 				int type, map_word *prev_val)
 {
