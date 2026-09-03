@@ -71,8 +71,8 @@ static const struct dma_slave_map pmb887x_dma_slave_map[] = {
 };
 
 struct pl08x_platform_data pmb887x_pl080_plat_data = {
-	.lli_buses			= PL08X_AHB2,
-	.mem_buses			= PL08X_AHB2,
+	.lli_buses			= PL08X_AHB1,
+	.mem_buses			= PL08X_AHB1,
 	.slave_channels		= pmb887x_dma_info,
 	.num_slave_channels	= ARRAY_SIZE(pmb887x_dma_info),
 	.slave_map			= pmb887x_dma_slave_map,
