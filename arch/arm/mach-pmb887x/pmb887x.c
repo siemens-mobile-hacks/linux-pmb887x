@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <linux/memblock.h>
+#include <linux/mm.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
 
@@ -6,6 +8,7 @@
 #include <linux/amba/pl080.h>
 #include <linux/amba/mmci.h>
 
+#include <asm/cacheflush.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/system_misc.h>
@@ -105,6 +108,32 @@ static struct map_desc pmb887x_io_desc[] __initdata = {
 static void __init pmb887x_map_io(void) {
 	iotable_init(pmb887x_io_desc, ARRAY_SIZE(pmb887x_io_desc));
 }
+
+#ifdef CONFIG_XIP_KERNEL
+/*
+ * Override the __weak generic zero page setup in mm/mm_init.c.
+ *
+ * The generic empty_zero_page is a const array, so it lands in .rodata. For an
+ * XIP kernel .rodata is part of the ROM image in flash rather than the linear
+ * RAM mapping, so virt_to_page() on it computes a pfn below PHYS_PFN_OFFSET:
+ * a struct page pointer before mem_map, and a physical address that nothing on
+ * the bus decodes. Every read fault on anonymous memory then maps that address
+ * into userspace, and every refcount op on the bogus page scribbles over
+ * whatever precedes mem_map. Hand the zero page a real page of RAM instead.
+ *
+ * Called from mm_core_init() while memblock is still the active allocator.
+ */
+void __init arch_setup_zero_pages(void)
+{
+	void *zero_page = memblock_alloc(PAGE_SIZE, PAGE_SIZE);
+
+	if (!zero_page)
+		panic("failed to allocate the zero page\n");
+
+	__zero_page = virt_to_page(zero_page);
+	flush_dcache_folio(page_folio(__zero_page));
+}
+#endif /* CONFIG_XIP_KERNEL */
 
 static const char *pmb8876_board_compat[] = {
 	"infineon,pmb8876",
