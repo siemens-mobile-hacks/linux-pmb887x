@@ -13,7 +13,7 @@
 #define PMB887X_IO_BASE		0xF0000000
 #define PMB887X_IO_SIZE		0x0E000000
 
-#define PMB887X_SCU_DMAEN	0xF4400084
+#define PMB887X_SCU_DMARS	0xF4400084
 #define PMB887X_DMAC_BASE	0xF3000000
 #define PMB887X_MMCI_BASE	0xF7301000
 
@@ -28,25 +28,24 @@ static struct mmci_platform_data pmb887x_pl180_plat_data = {
 static int pl08x_get_xfer_signal(const struct pl08x_channel_data *cd) {
 	unsigned int signal = cd->min_signal, val;
 	unsigned long flags;
-	
+
 	spin_lock_irqsave(&pmb887x_dma_lock, flags);
-	val = readl((void *) PMB887X_SCU_DMAEN);
-	val |= 1 << signal;
-	writel(val, (void *) PMB887X_SCU_DMAEN);
+	val = readl((void *) PMB887X_SCU_DMARS);
+	if (cd->muxval)
+		val |= 1 << signal;
+	else
+		val &= ~(1 << signal);
+	writel(val, (void *) PMB887X_SCU_DMARS);
 	spin_unlock_irqrestore(&pmb887x_dma_lock, flags);
-	
+
 	return signal;
 }
 
 static void pl08x_put_xfer_signal(const struct pl08x_channel_data *cd, int signal) {
-	unsigned int val;
-	unsigned long flags;
-	
-	spin_lock_irqsave(&pmb887x_dma_lock, flags);
-	val = readl((void *) PMB887X_SCU_DMAEN);
-	val &= ~(1 << signal);
-	writel(val, (void *) PMB887X_SCU_DMAEN);
-	spin_unlock_irqrestore(&pmb887x_dma_lock, flags);
+	/*
+	 * Nothing to undo: the selection only matters while a transfer is set
+	 * up, and every request programs it before use.
+	 */
 }
 
 static struct pl08x_channel_data pmb887x_dma_info[] = {
@@ -54,12 +53,14 @@ static struct pl08x_channel_data pmb887x_dma_info[] = {
 		.bus_id = "mmci0_tx",
 		.min_signal = 13,
 		.max_signal = 13,
+		.muxval = 1,
 		.periph_buses = PL08X_AHB2,
 	}, 
 	{
 		.bus_id = "mmci0_rx",
 		.min_signal = 6,
 		.max_signal = 6,
+		.muxval = 1,
 		.periph_buses = PL08X_AHB2
 	}
 };
