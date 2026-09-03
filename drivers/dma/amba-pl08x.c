@@ -2846,12 +2846,20 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 		writel(0x000000FF, pl08x->base + PL080_ERR_CLEAR);
 	writel(0x000000FF, pl08x->base + PL080_TC_CLEAR);
 
-	/* Attach the interrupt handler */
-	ret = request_irq(adev->irq[0], pl08x_irq, 0, DRIVER_NAME, pl08x);
-	if (ret) {
-		dev_err(&adev->dev, "%s failed to request interrupt %d\n",
-			__func__, adev->irq[0]);
-		goto out_no_irq;
+	/*
+	 * Attach the interrupt handler. Some SoCs give the controller a whole
+	 * set of lines - one per channel plus an error line - rather than a
+	 * single combined one, so take every line the device exposes.
+	 */
+	for (i = 0; i < AMBA_NR_IRQS && adev->irq[i]; i++) {
+		ret = request_irq(adev->irq[i], pl08x_irq, 0, DRIVER_NAME, pl08x);
+		if (ret) {
+			dev_err(&adev->dev, "%s failed to request interrupt %d\n",
+				__func__, adev->irq[i]);
+			while (i--)
+				free_irq(adev->irq[i], pl08x);
+			goto out_no_irq;
+		}
 	}
 
 	/* Initialize physical channels */
@@ -2964,7 +2972,8 @@ out_no_slave:
 out_no_memcpy:
 	kfree(pl08x->phy_chans);
 out_no_phychans:
-	free_irq(adev->irq[0], pl08x);
+	for (i = 0; i < AMBA_NR_IRQS && adev->irq[i]; i++)
+		free_irq(adev->irq[i], pl08x);
 out_no_irq:
 	dma_pool_destroy(pl08x->pool);
 out_no_lli_pool:
