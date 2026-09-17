@@ -19,6 +19,7 @@
 #define PMB887X_SCU_DMARS	0xF4400084
 #define PMB887X_DMAC_BASE	0xF3000000
 #define PMB887X_MMCI_BASE	0xF7301000
+#define PMB887X_DIF_BASE	0xF7100000
 
 static spinlock_t pmb887x_dma_lock = __SPIN_LOCK_UNLOCKED(x);
 
@@ -65,12 +66,34 @@ static struct pl08x_channel_data pmb887x_dma_info[] = {
 		.max_signal = 6,
 		.muxval = 1,
 		.periph_buses = PL08X_AHB2
+	},
+	{
+		.bus_id = "dif_tx",
+		.min_signal = 4,
+		.max_signal = 4,
+		.muxval = 0,
+		.periph_buses = PL08X_AHB2
+	},
+	{
+		.bus_id = "dif_rx",
+		.min_signal = 5,
+		.max_signal = 5,
+		.muxval = 0,
+		.periph_buses = PL08X_AHB2
 	}
 };
 
+/*
+ * Channels are matched by device name rather than through a devicetree "dmas"
+ * phandle: the first pl08x DT cell selects a slave_channels[] index, which on
+ * this SoC does not equal the request line, and the SCU_DMARS mux mapping has
+ * no devicetree representation either.
+ */
 static const struct dma_slave_map pmb887x_dma_slave_map[] = {
 	{ "pmb887x-mmc.0", "tx", &pmb887x_dma_info[0] },
 	{ "pmb887x-mmc.0", "rx", &pmb887x_dma_info[1] },
+	{ "pmb887x-dif.0", "tx", &pmb887x_dma_info[2] },
+	{ "pmb887x-dif.0", "rx", &pmb887x_dma_info[3] },
 };
 
 struct pl08x_platform_data pmb887x_pl080_plat_data = {
@@ -88,6 +111,7 @@ struct pl08x_platform_data pmb887x_pl080_plat_data = {
 static struct of_dev_auxdata pmb887x_auxdata[] __initdata = {
 	OF_DEV_AUXDATA("arm,pl080", PMB887X_DMAC_BASE, "pmb887x-dma.0", &pmb887x_pl080_plat_data),
 	OF_DEV_AUXDATA("arm,primecell", PMB887X_MMCI_BASE, "pmb887x-mmc.0", &pmb887x_pl180_plat_data),
+	OF_DEV_AUXDATA("infineon,pmb8876-dif", PMB887X_DIF_BASE, "pmb887x-dif.0", NULL),
 	{}
 };
 

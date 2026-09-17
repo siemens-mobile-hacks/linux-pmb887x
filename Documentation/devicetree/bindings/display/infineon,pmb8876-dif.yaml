@@ -1,0 +1,102 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/display/infineon,pmb8876-dif.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Infineon PMB8876 DIFv2 Display Interface
+
+maintainers:
+  - Alula <git@alula.me>
+
+description: |
+  The Display Interface (DIF) v2 of the Infineon PMB8876 (S-Gold2) is an
+  MCU-parallel (Intel 8080 style) display interface. It drives an 8-bit data
+  bus with a command/data strobe (CD), a write strobe, an optional read strobe
+  and up to two chip selects, so several displays can share the bus. Each write
+  to the transmit FIFO latches its own chip select and CD state, which allows a
+  command and its pixel data to be queued back to back.
+
+  In front of the bus sits a 32x32 bit multiplexer with per-bit constant,
+  clamping and inversion stages plus a 3x3 colour matrix, so pixel data can be
+  re-packed and converted on the fly. Both FIFOs can be served by the SoC's
+  PL080 DMA controller.
+
+  The PL080 slave channels are not described here. On this SoC the DMA
+  controller is instantiated from platform data and its slave channels are
+  matched by device name, so the DIF transmit and receive channels are resolved
+  through the machine code rather than through a dmas phandle.
+
+properties:
+  compatible:
+    const: infineon,pmb8876-dif
+
+  reg:
+    maxItems: 1
+
+  interrupts:
+    maxItems: 4
+
+  interrupt-names:
+    items:
+      - const: rx-single
+      - const: rx-burst
+      - const: tx
+      - const: err
+
+  clocks:
+    maxItems: 1
+
+  "#address-cells":
+    const: 1
+
+  "#size-cells":
+    const: 0
+
+patternProperties:
+  "^panel@[1-2]$":
+    $ref: panel/renesas,r61505u.yaml#
+    description:
+      A display attached to one of the two chip selects of the interface.
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - interrupt-names
+  - clocks
+  - "#address-cells"
+  - "#size-cells"
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/gpio/gpio.h>
+
+    display-controller@f7100000 {
+        compatible = "infineon,pmb8876-dif";
+        reg = <0xf7100000 0xc004>;
+        interrupts = <134>, <135>, <136>, <137>;
+        interrupt-names = "rx-single", "rx-burst", "tx", "err";
+        clocks = <&clc 7>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&dif_pads>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        panel@1 {
+            compatible = "renesas,r61505u";
+            reg = <1>;
+            reset-gpios = <&gpio 27 GPIO_ACTIVE_LOW>;
+            backlight = <&backlight>;
+            rotation = <0>;
+            write-only;
+            infineon,init-sequence = [
+                01 02 02 00 07 00 00
+                02 0a
+                01 02 02 00 07 01 73
+            ];
+        };
+    };
+...

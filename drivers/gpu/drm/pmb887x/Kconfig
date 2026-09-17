@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config DRM_PMB887X_DIF
+	tristate "DRM support for the Infineon PMB8876 display interface"
+	depends on DRM && (ARCH_PMB887X || COMPILE_TEST)
+	select DRM_CLIENT_SELECTION
+	select DRM_KMS_HELPER
+	select DRM_GEM_DMA_HELPER
+	select BACKLIGHT_CLASS_DEVICE
+	help
+	  DRM driver for the DIFv2 display interface of the Infineon S-Gold2/S-Gold3
+	  phone SoC, driving an MCU-parallel (Intel 8080 style) LCD.
+
+	  If M is selected the module will be called pmb887x-dif.
+
+config DRM_PMB887X_PANEL_ILI9320
+	bool "ILI9320 family panels"
+	depends on DRM_PMB887X_DIF
+	default y
+	help
+	  Support for panels whose controller addresses its frame memory
+	  through a register index and one 16-bit value per coordinate, with
+	  rotation expressed as the AM and ID bits of an entry mode register.
+
+	  This covers the R61505U/ILI9320 and its relatives. Say Y unless you
+	  know the panel on your board is driven some other way.

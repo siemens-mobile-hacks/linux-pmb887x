@@ -218,6 +218,7 @@ obj-y			+= mxsfb/
 obj-y			+= sysfb/
 obj-y			+= tiny/
 obj-$(CONFIG_DRM_PL111) += pl111/
+obj-$(CONFIG_DRM_PMB887X_DIF) += pmb887x/
 obj-$(CONFIG_DRM_TVE200) += tve200/
 obj-$(CONFIG_DRM_ADP) += adp/
 obj-$(CONFIG_DRM_XEN) += xen/

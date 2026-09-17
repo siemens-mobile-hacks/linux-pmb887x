@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/display/panel/renesas,r61505u.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Renesas R61505U based MCU-parallel Display Panel
+
+maintainers:
+  - Alula <git@alula.me>
+
+description:
+  The Renesas R61505U is an ILI9320-class controller for 240x320 TFT panels.
+  It is driven over an MCU-parallel (Intel 8080 style) bus, where a register is
+  selected by a 16-bit index written with the command/data line asserted and
+  the 16-bit register value follows with that line deasserted.
+
+allOf:
+  - $ref: panel-common.yaml#
+
+properties:
+  compatible:
+    const: renesas,r61505u
+
+  reg:
+    description: Index of the chip select the panel is wired to.
+    minimum: 1
+    maximum: 2
+
+  write-only:
+    type: boolean
+    description:
+      The read strobe of the panel is not wired up, so the controller can
+      never be read back. Panel identification and the current register
+      contents are then unknowable and the driver must rely on the init
+      sequence alone.
+
+  infineon,continuous-splash:
+    type: boolean
+    description:
+      The boot loader has already brought the panel up and left an image on
+      screen. Reset, the init sequence and the initial GRAM clear are skipped
+      so that the image survives until the first frame is flushed.
+
+  infineon,init-sequence:
+    $ref: /schemas/types.yaml#/definitions/uint8-array
+    description: |
+      Controller bring-up program, run once after reset. It is a flat stream of
+      variable length commands, each introduced by an opcode byte:
+
+        0x01 <ncmd> <nparam> <cmd bytes> <param bytes>
+          Send ncmd bytes with the command/data line asserted, followed by
+          nparam bytes with it deasserted.
+
+        0x02 <ms>
+          Wait ms milliseconds.
+
+      A register write on this panel is therefore
+      01 02 02 00 <index> <value hi> <value lo>: the register index goes out
+      as the two command bytes 0x00 and <index>, and the 16-bit value follows
+      as two data bytes, most significant byte first.
+
+  backlight: true
+  reset-gpios: true
+  rotation: true
+  te-gpios: true
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/gpio/gpio.h>
+
+    display-controller {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        panel@1 {
+            compatible = "renesas,r61505u";
+            reg = <1>;
+            reset-gpios = <&gpio 27 GPIO_ACTIVE_LOW>;
+            backlight = <&backlight>;
+            rotation = <0>;
+            write-only;
+            infineon,init-sequence = [
+                01 02 02 00 07 00 00
+                02 0a
+                01 02 02 00 07 01 73
+            ];
+        };
+    };
+...

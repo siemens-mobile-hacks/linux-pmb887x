@@ -50,7 +50,8 @@
 			      <0xf4b00000 4>,	/* PMB887X_CLK_STM */
 			      <0xf6400000 4>,	/* PMB887X_CLK_TPU */
 			      <0xf4000000 4>,	/* PMB887X_CLK_CAPCOM0 */
-			      <0xf4100000 4>;	/* PMB887X_CLK_CAPCOM1 */
+			      <0xf4100000 4>,	/* PMB887X_CLK_CAPCOM1 */
+			      <0xf7100000 4>;	/* PMB887X_CLK_DIF */
 			clocks = <&fsys_clk>;
 			#clock-cells = <1>;
 
@@ -191,6 +192,17 @@
 			reg = <0xf4d00000 0x200>;
 			interrupt-names = "press", "repeat", "int2", "release";
 			interrupts = <108>, <109>, <110>, <111>;
+			status = "disabled";
+		};
+
+		dif: display-controller@f7100000 {
+			compatible = "infineon,pmb8876-dif";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0xf7100000 0xc004>;
+			interrupt-names = "rx-single", "rx-burst", "tx", "err";
+			interrupts = <134>, <135>, <136>, <137>;
+			clocks = <&clc PMB887X_CLK_DIF>;
 			status = "disabled";
 		};
 	};
