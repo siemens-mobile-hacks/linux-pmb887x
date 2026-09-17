@@ -537,6 +537,20 @@ config KEYBOARD_PINEPHONE
 	  To compile this driver as a module, choose M here; the
 	  module will be called pinephone-keyboard.
 
+config KEYBOARD_PMB887X
+	tristate "Infineon PMB887x keypad support"
+	depends on ARCH_PMB887X || COMPILE_TEST
+	depends on HAS_IOMEM
+	select INPUT_MATRIXKMAP
+	help
+	  Say Y here to enable support for the keypad scanner of the Infineon
+	  PMB887x (S-Gold) SoCs. The controller scans the matrix on its own and
+	  latches it into registers the driver reads back, up to eight rows by
+	  twelve columns.
+
+	  To compile this driver as a module, choose M here: the module will
+	  be called pmb887x-keypad.
+
 config KEYBOARD_PXA27x
 	tristate "PXA27x/PXA3xx keypad support"
 	depends on PXA27x || PXA3xx || ARCH_MMP || COMPILE_TEST

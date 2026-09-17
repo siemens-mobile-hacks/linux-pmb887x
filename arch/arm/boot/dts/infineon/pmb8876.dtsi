@@ -185,5 +185,13 @@
 			clocks = <&clc PMB887X_CLK_ASC1>;
 			status = "disabled";
 		};
+
+		keypad: keypad@f4d00000 {
+			compatible = "infineon,pmb8876-keypad";
+			reg = <0xf4d00000 0x200>;
+			interrupt-names = "press", "repeat", "int2", "release";
+			interrupts = <108>, <109>, <110>, <111>;
+			status = "disabled";
+		};
 	};
 };

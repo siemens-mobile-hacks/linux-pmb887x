@@ -1,0 +1,93 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/input/infineon,pmb8876-keypad.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Infineon PMB8876 Keypad Scanner
+
+maintainers:
+  - Alula <git@alula.me>
+
+description: |
+  The keypad block of the Infineon PMB8876 (S-Gold2) scans a matrix of up to
+  eight input rows by twelve output columns without software help and latches
+  the result into three PORT registers, each holding four columns of eight
+  active low rows.
+
+  It raises four service requests: a key was pressed, the hardware repeat
+  interval elapsed, an internal condition, and a key was released. Only the
+  press and release requests are used by Linux, which does its own autorepeat,
+  but all four are described here because all four are wired to the interrupt
+  controller. The requests only serve to wake the driver out of idle; the
+  matrix is polled for as long as a key is held, because the release request
+  can arrive before the PORT registers reflect the release.
+
+  The SoC brings out four column lines on dedicated pads. A board may drive
+  further columns from a pad whose alternate output function is a keypad
+  column, in which case those columns appear in the second and third PORT
+  register and only the pin control setup differs.
+
+allOf:
+  - $ref: /schemas/input/matrix-keymap.yaml#
+
+properties:
+  compatible:
+    const: infineon,pmb8876-keypad
+
+  reg:
+    maxItems: 1
+
+  interrupts:
+    maxItems: 4
+
+  interrupt-names:
+    items:
+      - const: press
+      - const: repeat
+      - const: int2
+      - const: release
+
+  linux,no-autorepeat:
+    type: boolean
+    description:
+      Do not enable autorepeat in the input core for this keypad.
+
+  poll-interval:
+    default: 20
+    description:
+      Interval in milliseconds at which the matrix is re-read while a key is
+      held down.
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - interrupt-names
+  - linux,keymap
+  - keypad,num-rows
+  - keypad,num-columns
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/input/input.h>
+
+    keypad@f4d00000 {
+        compatible = "infineon,pmb8876-keypad";
+        reg = <0xf4d00000 0x200>;
+        interrupts = <108>, <109>, <110>, <111>;
+        interrupt-names = "press", "repeat", "int2", "release";
+        pinctrl-names = "default";
+        pinctrl-0 = <&kp_pads>;
+
+        keypad,num-rows = <2>;
+        keypad,num-columns = <2>;
+
+        linux,keymap = <MATRIX_KEY(0, 0, KEY_MENU)
+                        MATRIX_KEY(0, 1, KEY_ENTER)
+                        MATRIX_KEY(1, 0, KEY_1)
+                        MATRIX_KEY(1, 1, KEY_2)>;
+    };
+...

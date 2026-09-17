@@ -3,6 +3,7 @@
 #include "pmb8876.dtsi"
 
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
 #include <dt-bindings/pinctrl/pmb887x.h>
 #include "ke970-pins.h"
 
@@ -94,6 +95,55 @@
 	};
 };
 
+
+/*
+ * 6x5 matrix on KP_IN0..5 and KP_OUT0..4, where the fifth column is not a
+ * KP_OUT pad but T_OUT7 in its ALT1 output function, configured over in
+ * t_out_pads. That column carries only the second stage of the camera side
+ * key, so it is left out of the keymap for now; adding it means bumping
+ * keypad,num-columns to 5 and mapping (5, 4) to KEY_CAMERA.
+ */
+&keypad {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&keypad_pads>;
+
+	keypad,num-rows = <6>;
+	keypad,num-columns = <4>;
+
+	linux,keymap = <
+		MATRIX_KEY(0, 0, KEY_MENU)		/* left soft key */
+		MATRIX_KEY(0, 1, KEY_ENTER)		/* OK */
+		MATRIX_KEY(0, 2, KEY_SEARCH)		/* right soft key */
+		MATRIX_KEY(0, 3, KEY_SEND)
+
+		MATRIX_KEY(1, 0, KEY_1)
+		MATRIX_KEY(1, 1, KEY_2)
+		MATRIX_KEY(1, 2, KEY_3)
+		MATRIX_KEY(1, 3, KEY_BACKSPACE)		/* clear */
+
+		MATRIX_KEY(2, 0, KEY_4)
+		MATRIX_KEY(2, 1, KEY_5)
+		MATRIX_KEY(2, 2, KEY_6)
+		MATRIX_KEY(2, 3, KEY_VOLUMEUP)
+
+		MATRIX_KEY(3, 0, KEY_7)
+		MATRIX_KEY(3, 1, KEY_8)
+		MATRIX_KEY(3, 2, KEY_9)
+		MATRIX_KEY(3, 3, KEY_VOLUMEDOWN)
+
+		MATRIX_KEY(4, 0, KEY_NUMERIC_STAR)
+		MATRIX_KEY(4, 1, KEY_0)
+		MATRIX_KEY(4, 2, KEY_NUMERIC_POUND)
+		MATRIX_KEY(4, 3, KEY_MEDIA)		/* music player */
+
+		MATRIX_KEY(5, 0, KEY_LEFT)
+		MATRIX_KEY(5, 1, KEY_POWER)		/* end call, also drives PMIC ON */
+		MATRIX_KEY(5, 2, KEY_RIGHT)
+		MATRIX_KEY(5, 3, KEY_CAMERA_FOCUS)	/* camera side key, half press */
+	>;
+};
+
 &gpio {
 	gpio-line-names = "KP_IN0", "KP_IN1", "KP_IN2", "KP_IN3", "KP_IN4", "KP_IN5", "KP_IN6", "KP_OUT0", "KP_OUT1",
 		"KP_OUT2", "KP_OUT3", "USART0_RXD", "USART0_TXD", "USART0_RTS", "USART0_CTS", "SCROLL_KEY_A",
@@ -146,7 +196,7 @@
 			PMB887X_PAD(PMB887X_PIN_DIF_D0, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
 			PMB887X_PAD(PMB887X_PIN_DIF_CD, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
 			PMB887X_PAD(PMB887X_PIN_DIF_CS1, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
-			PMB887X_PAD(PMB887X_PIN_DIF_RESET1, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
+			PMB887X_PAD(PMB887X_PIN_DIF_RESET1, PMB887X_PS_MANUAL | PMB887X_DATA_HIGH | PMB887X_DIR_OUT | PMB887X_PDPU_PULLUP)
 			PMB887X_PAD(PMB887X_PIN_DIF_D1, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
 			PMB887X_PAD(KE970_PIN_USB_CHG_EN, PMB887X_IS_ALT0 | PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
 			PMB887X_PAD(PMB887X_PIN_DIF_D3, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLUP)
@@ -199,7 +249,7 @@
 			PMB887X_PAD(PMB887X_PIN_T_OUT4, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLDOWN)
 			PMB887X_PAD(PMB887X_PIN_T_OUT5, PMB887X_PS_MANUAL | PMB887X_DIR_OUT)
 			PMB887X_PAD(PMB887X_PIN_T_OUT6, PMB887X_OS_ALT0 | PMB887X_PDPU_PULLDOWN)
-			PMB887X_PAD(PMB887X_PIN_T_OUT7, PMB887X_OS_ALT1 | PMB887X_PPEN_OPENDRAIN)
+			PMB887X_PAD(KE970_PIN_KP_OUT4, PMB887X_OS_ALT1 | PMB887X_PPEN_OPENDRAIN)
 			PMB887X_PAD(KE970_PIN_JACK_DETECT, PMB887X_IS_ALT4 | PMB887X_PPEN_OPENDRAIN | PMB887X_PDPU_PULLUP)
 			PMB887X_PAD(KE970_PIN_LCD_BACKLIGHT, PMB887X_OS_ALT2)
 			PMB887X_PAD(PMB887X_PIN_T_OUT10, PMB887X_PS_MANUAL)
